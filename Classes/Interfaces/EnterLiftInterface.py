@@ -27,7 +27,7 @@ class EnterLiftInterface(InterfaceTemplate):
     # Method
     
     # Specialized DisplayInterface method, contains some input handling
-    def DisplayInterface(self):
+    def DisplayInterface(self, caller):
         ic = InputController()
         
         lift = Record(None, None, None, None)
@@ -35,36 +35,29 @@ class EnterLiftInterface(InterfaceTemplate):
             print(output)
         
         # Get lift name, then find enum
-        lift_name = input()
-        for enum in LiftEnums:
-            if enum.name == lift_name:
-                lift.LiftType = enum.value
-        """      
-        lift.LiftType = ic.TakeInputAndReturn(
-            def func(*params):
-                for enum in LiftEnums:
-                    if enum.name == params.inp[0]:
-                        params.target = enum.value
-            )
-            
-        lift.LiftType = ic.TakeInputAndReturn(() => {
-            ...
-        })
-        """
-                
-                
-        # Handling if the lift isn't tracked
-        if lift.LiftType == None:
-            print("That lift is not tracked by the system")
-            return
+        def modifier(inp):
+            for enum in LiftEnums:
+                if enum.name == inp:
+                    return enum.value
+            print("That lift is not recognized by the system.\nPlease reenter the lift name.")
+            return None
+        lift.LiftType = ic.TakeInputAndReturn(modifier)
         
+        print(isinstance(CreateAthleteInterface(), CreateAthleteInterface))
         # Get athlete name, then find ID or prompt creating new athlete
-        athlete_name = input()
-        athletes = SystemData["Athletes"]
-        for athleteID in athletes:
-            if athlete_name == athletes[athleteID].Name:
-                lift.Athlete = athletes[athleteID].Name
-                
+        def modifier(inp):
+            athletes = SystemData["Athletes"]
+            for athleteID in athletes:
+                if inp == athletes[athleteID].Name:
+                    return athletes[athleteID].Name
+            # Athlete was not found
+            print("Athlete does not exist. Would you like to create one? (Y or N)")
+            temp_inp = input()
+            if temp_inp == "Y":
+                return [CreateAthleteInterface(), CreateAthleteInterface]
+        lift.Athlete = ic.TakeInputAndReturn_SCREEN_CHANGER(modifier, caller)
+
+        """
         # Handle athlete not existing
         if lift.Athlete == None:
             print("Athlete does not exist, would you like to create one? (Y or N)")
@@ -82,6 +75,7 @@ class EnterLiftInterface(InterfaceTemplate):
                         if athlete_name == athletes[athleteID].Name:
                             lift.Athlete = athletes[athleteID].Name
                             needs_valid = False
+        """
         
         lift.Weight = float(input())
         
