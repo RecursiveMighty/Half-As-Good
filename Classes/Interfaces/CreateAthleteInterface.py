@@ -27,7 +27,7 @@ class CreateAthleteInterface(InterfaceTemplate):
     # Methods
     
     # Custom DisplayInterface method, contains some input handling
-    def DisplayInterface(self):
+    def DisplayInterface(self, main):
         athlete = Athlete(None, None, None)
         for output in self.RequiredInformation:
             print(output)

@@ -27,7 +27,7 @@ class EnterLiftInterface(InterfaceTemplate):
     # Method
     
     # Specialized DisplayInterface method, contains some input handling
-    def DisplayInterface(self, caller):
+    def DisplayInterface(self, main):
         ic = InputController()
         
         lift = Record(None, None, None, None)
@@ -43,40 +43,22 @@ class EnterLiftInterface(InterfaceTemplate):
             return None
         lift.LiftType = ic.TakeInputAndReturn(modifier)
         
-        print(isinstance(CreateAthleteInterface(), CreateAthleteInterface))
         # Get athlete name, then find ID or prompt creating new athlete
-        def modifier(inp):
+        def modifier(inp, main):
             athletes = SystemData["Athletes"]
             for athleteID in athletes:
                 if inp == athletes[athleteID].Name:
-                    return athletes[athleteID].Name
+                    return athleteID
             # Athlete was not found
             print("Athlete does not exist. Would you like to create one? (Y or N)")
             temp_inp = input()
             if temp_inp == "Y":
-                return [CreateAthleteInterface(), CreateAthleteInterface]
-        lift.Athlete = ic.TakeInputAndReturn_SCREEN_CHANGER(modifier, caller)
-
-        """
-        # Handle athlete not existing
-        if lift.Athlete == None:
-            print("Athlete does not exist, would you like to create one? (Y or N)")
-            inp = input()
-            if inp == "Y":
                 return CreateAthleteInterface()
-            elif inp == "N":
-                needs_valid = True
-                while needs_valid == True:
-                    print("Please enter a valid athlete name, or enter 1 to create a new athlete.")
-                    athlete_name = input()
-                    if athlete_name == "1":
-                        return CreateAthleteInterface()
-                    for athleteID in athletes:
-                        if athlete_name == athletes[athleteID].Name:
-                            lift.Athlete = athletes[athleteID].Name
-                            needs_valid = False
-        """
-        
+            elif temp_inp == "N":
+                print("Please enter a valid athlete name.")
+                return None
+        lift.Athlete = ic.TakeInputAndReturn_SCREEN_CHANGER(modifier, main, self)
+
         lift.Weight = float(input())
         
-        print("Lift successfully created! " + lift.Athlete + " lifted " + str(lift.Weight) + " lbs, in a " + LiftEnums.GetNameFromValue(LiftEnums, lift.LiftType))
+        print("Lift successfully created! " + SystemData["Athletes"][lift.Athlete].Name + " lifted " + str(lift.Weight) + " lbs, in a " + LiftEnums.GetNameFromValue(LiftEnums, lift.LiftType))
